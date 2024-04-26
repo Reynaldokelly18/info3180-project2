@@ -6,7 +6,7 @@ This file creates your application.
 """
 
 import os
-import jwt
+import jwt 
 from datetime import datetime, timedelta
 from functools import wraps
 from time import time
