@@ -4,7 +4,7 @@ from wtforms.validators import InputRequired, Email
 from flask_wtf.file import FileField,FileRequired,FileAllowed
 
 
-class Register(FlaskForm):
+class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
     first_name = StringField('First Name', validators=[InputRequired()])
@@ -19,7 +19,7 @@ class Register(FlaskForm):
 
 
 
-class NewPost(FlaskForm):
+class NewPostForm(FlaskForm):
     photo = FileField('Upload Poster', validators=[
         FileRequired(message='Please upload movie poster'),
         FileAllowed(['jpg', 'png'], message='Only JPEG and PNG images are allowed.')

@@ -15,8 +15,8 @@ from flask import render_template, request, jsonify, send_file, session, send_fr
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
-from app.forms import LoginForm, RegistrationForm, NewPostForm
-from app.models import User, Post, Follow, Like
+from app.forms import RegistrationForm, NewPostForm
+from app.models import Users, Posts, Follows, Likes
 from flask_wtf.csrf import generate_csrf
 
 

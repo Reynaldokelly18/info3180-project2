@@ -61,10 +61,10 @@ class Users(db.Model):
     last_name = db.Column(db.String(80))
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(255), unique=True)
-    email = db.column(db.String(80), unique=True)
-    location = db.column(db.String(80), unique=True)
-    biography = db.column(db.String(80), unique=True)
-    profile_photo = db.column(db.String(80), unique=True)
+    email = db.Column(db.String(80), unique=True)
+    location = db.Column(db.String(80), unique=True)
+    biography = db.Column(db.String(80), unique=True)
+    profile_photo = db.Column(db.String(80), unique=True)
     joined_on = db.Column(db.DateTime)
 
 

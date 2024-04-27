@@ -1,7 +1,7 @@
 <template>
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <div class="container-fluid">
+      <div class="container-fluid headerparent">
         <a class="navbar-brand" href="/">VueJS with Flask</a>
         <button
           class="navbar-toggler"
@@ -20,7 +20,7 @@
               <RouterLink to="/" class="nav-link active">Home</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">About</RouterLink>
+              <RouterLink class="nav-link" to="/profile">My Profile</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link" to="/explore">Explore</RouterLink>
@@ -40,5 +40,8 @@ import { RouterLink } from "vue-router";
 </script>
 
 <style>
-/* Add any component specific styles here */
+ div.headerparent{
+   display:flex !important;
+   justify-items: space-between !important;
+ }
 </style>
