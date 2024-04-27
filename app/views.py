@@ -13,9 +13,9 @@ from time import time
 from app import app, db, login_manager
 from flask import render_template, request, jsonify, send_file, session, send_from_directory, url_for, redirect, g
 from flask_login import login_user, logout_user, current_user, login_required
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename,generate_token
 from werkzeug.security import check_password_hash
-from app.forms import RegistrationForm, NewPostForm
+from app.forms import RegistrationForm, NewPostForm,LoginForm
 from app.models import Users, Posts, Follows, Likes
 from flask_wtf.csrf import generate_csrf
 
@@ -78,11 +78,11 @@ def register():
         profile_photo = secure_filename(photo.filename)
         joined_on = datetime.utcnow()
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], profile_photo))
-        user = User(username,password,firstname,lastname,email,location,biography,profile_photo,joined_on)
+        user = Users(username,password,firstname,lastname,email,location,biography,profile_photo,joined_on)
         db.session.add(user)
         db.session.commit()
         return jsonify({
-            "message": "User successfully registered.",
+            "message": "s successfully registered.",
             "username": username,
             "password": password,
             "firstname": firstname,
@@ -104,12 +104,12 @@ def login():
     if loginForm.validate_on_submit():
         uname = loginForm.username.data
         password = loginForm.password.data
-        user = db.session.execute(db.select(User).filter_by(username=uname)).scalar()
+        user = db.session.execute(db.select(Users).filter_by(username=uname)).scalar()
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
             jwt_token = generate_token(user.id)
             return jsonify({
-                "message": "User successfully logged in.",
+                "message": "s successfully logged in.",
                 "token": jwt_token
             }), 200
         return jsonify(errors=["Invalid username or password"])
@@ -123,7 +123,7 @@ def logout():
     """Logout a user"""
     logout_user()
     return jsonify({
-        "message": "User successfully logged out."
+        "message": "s successfully logged out."
     }), 200
 
 
@@ -139,7 +139,7 @@ def add_post(user_id):
         photo_filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
         created_on = datetime.utcnow()
-        post = Post(caption,photo_filename,user_id,created_on)
+        post = Posts(caption,photo_filename,user_id,created_on)
         db.session.add(post)
         db.session.commit()
         return jsonify({
@@ -156,8 +156,8 @@ def add_post(user_id):
 @requires_auth
 def get_user_details(user_id):
     """Returns user details"""
-    user_details = db.session.execute(db.select(User).filter_by(id=int(user_id))).scalar()
-    user_posts = db.session.execute(db.select(Post).filter_by(user_id=int(user_id))).scalars()
+    user_details = db.session.execute(db.select(Users).filter_by(id=int(user_id))).scalar()
+    user_posts = db.session.execute(db.select(Posts).filter_by(user_id=int(user_id))).scalars()
     posts = []
     for post in user_posts:
         posts.append({
@@ -186,7 +186,7 @@ def get_user_details(user_id):
 @requires_auth
 def get_posts(user_id):
     """Returns a user's posts"""
-    user_posts = db.session.execute(db.select(Post).filter_by(user_id=user_id)).scalars()
+    user_posts = db.session.execute(db.select(Posts).filter_by(user_id=user_id)).scalars()
     posts = []
     for post in user_posts:
         posts.append({
@@ -205,14 +205,14 @@ def get_posts(user_id):
 def follow(user_id):
     if request.method == 'POST':
         """Create a Follow relationship between the current user and the target user."""
-        follow = Follow(user_id=user_id, follower_id=int(current_user.get_id()))
+        follow = Follows(user_id=user_id, follower_id=int(current_user.get_id()))
         db.session.add(follow)
         db.session.commit()
         return jsonify({
             "message": "You are now following that user."
         }), 201
     if request.method == 'GET':
-        follows = db.session.execute(db.select(Follow).filter_by(user_id=user_id)).scalars()
+        follows = db.session.execute(db.select(Follows).filter_by(user_id=user_id)).scalars()
         return jsonify({
             "followers": len([follow for follow in follows])
         }), 201
@@ -223,11 +223,11 @@ def follow(user_id):
 @requires_auth
 def get_all_posts():
     """Return all posts for all users"""
-    posts = db.session.execute(db.select(Post)).scalars()
+    posts = db.session.execute(db.select(Posts)).scalars()
     all_posts = []
     for post in posts:
-        likes = db.session.execute(db.select(Like).filter_by(id=post.id)).scalars()
-        user = db.session.execute(db.select(User).filter_by(id=post.user_id)).scalar()
+        likes = db.session.execute(db.select(Likes).filter_by(id=post.id)).scalars()
+        user = db.session.execute(db.select(Users).filter_by(id=post.user_id)).scalar()
         all_posts.append({
             "id": post.id,
             "user_id": post.user_id,
@@ -245,17 +245,17 @@ def get_all_posts():
 @login_required
 @requires_auth
 def like(post_id):
-    """Set a like on the current Post by the logged in User"""
-    post = db.session.execute(db.select(Post).filter_by(id=post_id)).scalar()
+    """Set a like on the current Posts by the logged in s"""
+    post = db.session.execute(db.select(Posts).filter_by(id=post_id)).scalar()
     if post is not None:
-        likes = db.session.execute(db.select(Like).filter_by(post_id=post.id)).scalars()
+        likes = db.session.execute(db.select(Likes).filter_by(post_id=post.id)).scalars()
         if post is not None:
             uid = int(current_user.get_id())
-            like = Like(post_id, uid)
+            like = Likes(post_id, uid)
             db.session.add(like)
             db.session.commit()
             return jsonify({
-                "message": "Post liked!",
+                "message": "Posts liked!",
                 "likes": len([like for like in likes]) + 1
             }), 201
 
